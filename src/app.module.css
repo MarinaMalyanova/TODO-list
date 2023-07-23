@@ -1,5 +1,11 @@
 .app {
 	/* text-align: center; */
+	width: 500px;
+	border: 1px solid red;
+}
+.todoForm {
+	display: flex;
+	justify-content: space-between;
 }
 .loader {
 	position: fixed;
@@ -32,7 +38,38 @@
 	margin: 3px;
 }
 .todo {
-	background: lightgreen;
+	background: rgb(180, 239, 180);
+	width: 100%;
 	padding: 0 10px;
 	border-radius: 10px;
+	justify-content: start;
+	align-items: center;
+	font-size: 20px;
+	display: flex;
+	flex-wrap: wrap;
+}
+.todoInput {
+	width: 250px;
+	border: rgb(160, 160, 5);
+	background: rgb(246, 246, 183);
+	border-radius: 10px;
+	color: grey;
+}
+.checkbox {
+	margin: 10px;
+	width: 15px;
+	height: 15px;
+	justify-content: center;
+	align-items: center;
+}
+button {
+	padding: 10px;
+	border: none;
+	border-radius: 10px;
+	background: rgb(214, 255, 153);
+}
+.list {
+	display: flex;
+	width: 100%;
+	justify-content: space-between;
 }

@@ -1,0 +1,44 @@
+{
+  "todoList": [
+    {
+      "text": "Сделать ДЗ",
+      "complete": false,
+      "id": "001"
+    },
+    {
+      "text": "потренироваться",
+      "complete": false,
+      "id": "002"
+    },
+    {
+      "text": "купить еды",
+      "complete": false,
+      "id": "wSrL8IY"
+    },
+    {
+      "text": "заказать доставку",
+      "complete": false,
+      "id": "0jgghNz"
+    },
+    {
+      "text": "fdffdfd",
+      "complete": false,
+      "id": "ZPAtdJB"
+    },
+    {
+      "text": "",
+      "complete": false,
+      "id": "7iuvDVd"
+    },
+    {
+      "text": "111",
+      "complete": false,
+      "id": "oPphn4b"
+    },
+    {
+      "text": "333",
+      "complete": false,
+      "id": "vUkbC4D"
+    }
+  ]
+}
