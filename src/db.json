@@ -1,44 +1,29 @@
 {
   "todoList": [
     {
-      "text": "Сделать ДЗ",
+      "text": "333",
       "complete": false,
-      "id": "001"
+      "id": "1mZpLlt"
     },
     {
-      "text": "потренироваться",
+      "text": "марина",
       "complete": false,
-      "id": "002"
+      "id": "iXkSGcA"
     },
     {
       "text": "купить еды",
       "complete": false,
-      "id": "wSrL8IY"
+      "id": "pLk04px"
     },
     {
-      "text": "заказать доставку",
+      "text": "сделать дз",
       "complete": false,
-      "id": "0jgghNz"
+      "id": "Pir1HbE"
     },
     {
-      "text": "fdffdfd",
+      "text": "dffsd",
       "complete": false,
-      "id": "ZPAtdJB"
-    },
-    {
-      "text": "",
-      "complete": false,
-      "id": "7iuvDVd"
-    },
-    {
-      "text": "111",
-      "complete": false,
-      "id": "oPphn4b"
-    },
-    {
-      "text": "333",
-      "complete": false,
-      "id": "vUkbC4D"
+      "id": "nTNL1fm"
     }
   ]
 }

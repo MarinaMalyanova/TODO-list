@@ -8,11 +8,10 @@ function App() {
 	const [isUpdating, setIsUpdating] = useState(false);
 	const [isDeleting, setIsDeleting] = useState(false);
 	const [value, setValue] = useState('');
-	const [updateTodoListFlag, setUpdateTodoListFlag] = useState(false);
 	const [isSorting, setIsSorting] = useState(false);
+	const [isSearching, setIsSearching] = useState(false);
 	const [isSorted, setIsSorted] = useState(false);
-
-	const updateTodoList = () => setUpdateTodoListFlag(!updateTodoListFlag);
+	const [isSearch, setIsSearch] = useState(false);
 
 	useEffect(() => {
 		setIsLoading(true);
@@ -21,13 +20,9 @@ function App() {
 			.then((rawResponse) => rawResponse.json())
 			.then((loadedTodos) => {
 				setTodos(loadedTodos);
-				if (isSorted === true) {
-					setTodos(sortTasks);
-					console.log(todos);
-				}
 			})
 			.finally(() => setIsLoading(false));
-	}, [updateTodoListFlag]);
+	}, []);
 
 	const onChange = ({ target }) => {
 		setValue(target.value);
@@ -53,9 +48,13 @@ function App() {
 			.then((rawResponce) => rawResponce.json())
 			.then((responce) => {
 				console.log('Задача добавлена. Ответ сервера:', responce);
-				updateTodoList();
+				const newArray = todos.push(responce);
+				console.log(newArray);
 			})
-			.finally(() => setIsCreating(false));
+			.finally(() => {
+				setIsSearch(false);
+				setIsCreating(false);
+			});
 		console.log(todos);
 	};
 
@@ -74,9 +73,19 @@ function App() {
 			.then((rawResponce) => rawResponce.json())
 			.then((responce) => {
 				console.log('Задача обновлена. Ответ сервера:', responce);
-				updateTodoList();
+				setTodos(
+					todos.map((todo) => {
+						if (todo.id === id) {
+							todo.text = value;
+						}
+						return todo;
+					}),
+				);
 			})
-			.finally(() => setIsUpdating(false));
+			.finally(() => {
+				setIsSearch(false);
+				setIsUpdating(false);
+			});
 	};
 	const requestDeleteTask = (event) => {
 		const id = event.target.id;
@@ -88,9 +97,12 @@ function App() {
 			.then((rawResponce) => rawResponce.json())
 			.then((responce) => {
 				console.log('Задача удалена. Ответ сервера:', responce);
-				updateTodoList();
+				setTodos(todos.filter((todo) => todo.id !== id));
 			})
-			.finally(() => setIsDeleting(false));
+			.finally(() => {
+				setIsSearch(false);
+				setIsDeleting(false);
+			});
 	};
 
 	const sortTasks = () => {
@@ -100,13 +112,39 @@ function App() {
 			.then((sortArray) => {
 				console.log('Задачи отсортированы. Ответ сервера:', sortArray);
 				setIsSorted(true);
-				// updateTodoList();
 				setTodos(sortArray);
 			})
 			.finally(() => {
 				setIsSorting(false);
-				// setIsSorted(false);
+				setIsSearch(false);
 			});
+	};
+	const searchTask = () => {
+		setIsSearching(true);
+		fetch(`http://localhost:3004/todoList?q=${value}`)
+			.then((rawResponce) => rawResponce.json())
+			.then((responce) => {
+				console.log('Задача найдена. Ответ сервера:', responce);
+				responce.map((searchTodo) => {
+					const searchTodoId = searchTodo.id;
+					console.log(searchTodoId);
+					const searchTodoIndex = todos.findIndex(
+						(todo) => todo.id === searchTodoId,
+					);
+					console.log(searchTodoIndex);
+					// if (searchTodoIndex >= 0) {
+					todos.forEach((todo) => {
+						if (searchTodoIndex >= 0) {
+							console.log(todo.id === searchTodoId);
+							console.log('isSearch', isSearch);
+							setIsSearch(true);
+
+							return todo.id === searchTodoId;
+						}
+					});
+				});
+			})
+			.finally(() => setIsSearching(false));
 	};
 
 	return (
@@ -124,17 +162,24 @@ function App() {
 					Добавить задачу
 				</button>
 			</form>
-			<button disabled={isSorting} onClick={sortTasks}>
-				Сортировать задачи по алфавиту
-			</button>
+			<div className={styles.buttons}>
+				<button disabled={isSorting} onClick={sortTasks}>
+					Сортировать задачи по алфавиту
+				</button>
+				<button disabled={isSearching} onClick={searchTask}>
+					Поиск задачи
+				</button>
+			</div>
+
 			{isLoading ? (
 				<div className={styles.loader}></div>
 			) : (
 				todos.map(({ id, text }) => (
 					<div className={styles.list} key={id}>
 						<input type="checkbox" className={styles.checkbox}></input>
-						{/* <span className={styles.id}>{id}</span>{' '} */}
-						<span className={styles.todo}>{text}</span>
+						<span className={isSearch ? styles.searchTask : styles.todo}>
+							{text}
+						</span>
 						<button id={id} disabled={isUpdating} onClick={requestUpdateTask}>
 							Изменить
 						</button>
