@@ -9,7 +9,6 @@ function App() {
 	const [isDeleting, setIsDeleting] = useState(false);
 	const [value, setValue] = useState('');
 	const [isSorting, setIsSorting] = useState(false);
-	const [isSearching, setIsSearching] = useState(false);
 	const [isSorted, setIsSorted] = useState(false);
 	const [isSearch, setIsSearch] = useState(false);
 
@@ -26,7 +25,8 @@ function App() {
 
 	const onChange = ({ target }) => {
 		setValue(target.value);
-		// console.log(target.value);
+		const filter = todos.filter((todo) => todo.text.includes(target.value));
+		setTodos(filter);
 	};
 
 	const onSubmit = (event) => {
@@ -35,27 +35,33 @@ function App() {
 		console.log({ value });
 	};
 
-	const requestAddTask = () => {
+	const requestAddTask = async () => {
+		let newTask = {};
+
 		setIsCreating(true);
-		fetch('http://localhost:3004/todoList', {
+		const response = await fetch('http://localhost:3004/todoList', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json; charset=utf-8' },
 			body: JSON.stringify({
 				text: value,
 				complete: false,
 			}),
-		})
+		});
+		const json = await response.json();
+		console.log('Задача добавлена. Ответ сервера:', json);
+		newTask = { text: json.text, id: json.id };
+		console.log(newTask);
+
+		fetch('http://localhost:3004/todoList')
 			.then((rawResponce) => rawResponce.json())
-			.then((responce) => {
-				console.log('Задача добавлена. Ответ сервера:', responce);
-				const newArray = todos.push(responce);
-				console.log(newArray);
+			.then((data) => {
+				setTodos(data);
+				console.log('data', data);
 			})
 			.finally(() => {
 				setIsSearch(false);
 				setIsCreating(false);
 			});
-		console.log(todos);
 	};
 
 	const requestUpdateTask = (event) => {
@@ -119,33 +125,6 @@ function App() {
 				setIsSearch(false);
 			});
 	};
-	const searchTask = () => {
-		setIsSearching(true);
-		fetch(`http://localhost:3004/todoList?q=${value}`)
-			.then((rawResponce) => rawResponce.json())
-			.then((responce) => {
-				console.log('Задача найдена. Ответ сервера:', responce);
-				responce.map((searchTodo) => {
-					const searchTodoId = searchTodo.id;
-					console.log(searchTodoId);
-					const searchTodoIndex = todos.findIndex(
-						(todo) => todo.id === searchTodoId,
-					);
-					console.log(searchTodoIndex);
-					// if (searchTodoIndex >= 0) {
-					todos.forEach((todo) => {
-						if (searchTodoIndex >= 0) {
-							console.log(todo.id === searchTodoId);
-							console.log('isSearch', isSearch);
-							setIsSearch(true);
-
-							return todo.id === searchTodoId;
-						}
-					});
-				});
-			})
-			.finally(() => setIsSearching(false));
-	};
 
 	return (
 		<div className={styles.app}>
@@ -166,20 +145,15 @@ function App() {
 				<button disabled={isSorting} onClick={sortTasks}>
 					Сортировать задачи по алфавиту
 				</button>
-				<button disabled={isSearching} onClick={searchTask}>
-					Поиск задачи
-				</button>
 			</div>
 
 			{isLoading ? (
 				<div className={styles.loader}></div>
 			) : (
 				todos.map(({ id, text }) => (
-					<div className={styles.list} key={id}>
+					<div className={styles.list} key={id} id={id}>
 						<input type="checkbox" className={styles.checkbox}></input>
-						<span className={isSearch ? styles.searchTask : styles.todo}>
-							{text}
-						</span>
+						<span className={styles.todo}>{text}</span>
 						<button id={id} disabled={isUpdating} onClick={requestUpdateTask}>
 							Изменить
 						</button>

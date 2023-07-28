@@ -1,29 +1,19 @@
 {
   "todoList": [
     {
-      "text": "333",
-      "complete": false,
-      "id": "1mZpLlt"
-    },
-    {
-      "text": "марина",
-      "complete": false,
-      "id": "iXkSGcA"
-    },
-    {
       "text": "купить еды",
       "complete": false,
       "id": "pLk04px"
     },
     {
-      "text": "сделать дз",
+      "text": "купить телефон",
       "complete": false,
-      "id": "Pir1HbE"
+      "id": "qP4Neyr"
     },
     {
-      "text": "dffsd",
+      "text": "сделать дз",
       "complete": false,
-      "id": "nTNL1fm"
+      "id": "kW9J35f"
     }
   ]
 }
