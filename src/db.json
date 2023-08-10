@@ -1,19 +1,16 @@
 {
-  "todoList": [
-    {
+  "todos": {
+    "001": {
       "text": "купить еды",
-      "complete": false,
-      "id": "pLk04px"
+      "complete": false
     },
-    {
+    "002": {
       "text": "купить телефон",
-      "complete": false,
-      "id": "qP4Neyr"
+      "complete": false
     },
-    {
+    "003": {
       "text": "сделать дз",
-      "complete": false,
-      "id": "kW9J35f"
+      "complete": false
     }
-  ]
+}
 }

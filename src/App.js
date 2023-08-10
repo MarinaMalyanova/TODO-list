@@ -1,9 +1,18 @@
 import { useEffect, useState } from 'react';
 import styles from './app.module.css';
+import { ref, onValue, push, set, remove, orderByKey, get } from 'firebase/database';
+import {
+	query,
+	orderBy,
+	collection,
+	QuerySnapshot,
+	DocumentData,
+} from 'firebase/firestore';
+import { db } from './firebase';
 
 function App() {
 	const [todos, setTodos] = useState([]);
-	const [isLoading, setIsLoading] = useState(false);
+	const [isLoading, setIsLoading] = useState(true);
 	const [isCreating, setIsCreating] = useState(false);
 	const [isUpdating, setIsUpdating] = useState(false);
 	const [isDeleting, setIsDeleting] = useState(false);
@@ -13,19 +22,36 @@ function App() {
 	const [isSearch, setIsSearch] = useState(false);
 
 	useEffect(() => {
-		setIsLoading(true);
+		const todosDBRef = ref(db, 'todos');
 
-		fetch('http://localhost:3004/todoList')
-			.then((rawResponse) => rawResponse.json())
-			.then((loadedTodos) => {
-				setTodos(loadedTodos);
-			})
-			.finally(() => setIsLoading(false));
+		return onValue(todosDBRef, (snapshot) => {
+			const loadedTodos = snapshot.val() || {};
+			console.log(loadedTodos);
+			const loadedTodosArr = Object.entries(loadedTodos).map(([id, { text }]) => {
+				return {
+					id: id,
+					text: text,
+				};
+			});
+			console.log(loadedTodosArr);
+			isSorted ? setTodos(sortBy(loadedTodosArr)) : setTodos(loadedTodosArr);
+			setIsLoading(false);
+			setTodos(loadedTodos);
+		});
 	}, []);
+
+	console.log('todos', todos);
 
 	const onChange = ({ target }) => {
 		setValue(target.value);
-		const filter = todos.filter((todo) => todo.text.includes(target.value));
+		setIsSearch(true);
+		const todosArr = Object.entries(todos).map(([id, { text }]) => {
+			return {
+				id: id,
+				text: text,
+			};
+		});
+		const filter = todosArr.filter((todo) => todo.text.includes(target.value));
 		setTodos(filter);
 	};
 
@@ -36,57 +62,32 @@ function App() {
 	};
 
 	const requestAddTask = async () => {
-		let newTask = {};
-
 		setIsCreating(true);
-		const response = await fetch('http://localhost:3004/todoList', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json; charset=utf-8' },
-			body: JSON.stringify({
-				text: value,
-				complete: false,
-			}),
-		});
-		const json = await response.json();
-		console.log('Задача добавлена. Ответ сервера:', json);
-		newTask = { text: json.text, id: json.id };
-		console.log(newTask);
 
-		fetch('http://localhost:3004/todoList')
-			.then((rawResponce) => rawResponce.json())
-			.then((data) => {
-				setTodos(data);
-				console.log('data', data);
+		const todosDBRef = ref(db, 'todos');
+		push(todosDBRef, {
+			text: value,
+			complete: false,
+		})
+			.then((response) => {
+				console.log('Задача добавлена. Ответ сервера:', response);
 			})
-			.finally(() => {
-				setIsSearch(false);
-				setIsCreating(false);
-			});
+			.finally(() => setIsCreating(false));
 	};
 
 	const requestUpdateTask = (event) => {
 		const id = event.target.id;
 		console.log(id);
 		setIsUpdating(true);
-		fetch(`http://localhost:3004/todoList/${id}`, {
-			method: 'PUT',
-			headers: { 'Content-Type': 'application/json; charset=utf-8' },
-			body: JSON.stringify({
-				text: value,
-				complete: false,
-			}),
+
+		const updateTodosDBRef = ref(db, `todos/${id}`);
+		set(updateTodosDBRef, {
+			text: value,
+			complete: false,
 		})
-			.then((rawResponce) => rawResponce.json())
 			.then((responce) => {
 				console.log('Задача обновлена. Ответ сервера:', responce);
-				setTodos(
-					todos.map((todo) => {
-						if (todo.id === id) {
-							todo.text = value;
-						}
-						return todo;
-					}),
-				);
+				console.log(Object.entries(todos));
 			})
 			.finally(() => {
 				setIsSearch(false);
@@ -96,14 +97,13 @@ function App() {
 	const requestDeleteTask = (event) => {
 		const id = event.target.id;
 		console.log(id);
+
+		const removeTodosDBRef = ref(db, `todos/${id}`);
+		console.log(removeTodosDBRef);
 		setIsDeleting(true);
-		fetch(`http://localhost:3004/todoList/${id}`, {
-			method: 'DELETE',
-		})
-			.then((rawResponce) => rawResponce.json())
+		remove(removeTodosDBRef)
 			.then((responce) => {
 				console.log('Задача удалена. Ответ сервера:', responce);
-				setTodos(todos.filter((todo) => todo.id !== id));
 			})
 			.finally(() => {
 				setIsSearch(false);
@@ -111,19 +111,19 @@ function App() {
 			});
 	};
 
+	const sortBy = (data) => {
+		data.sort((a, b) => (a.text > b.text ? 1 : -1));
+		return data;
+	};
 	const sortTasks = () => {
-		setIsSorting(true);
-		fetch('http://localhost:3004/todoList?_sort=text')
-			.then((rawResponce) => rawResponce.json())
-			.then((sortArray) => {
-				console.log('Задачи отсортированы. Ответ сервера:', sortArray);
-				setIsSorted(true);
-				setTodos(sortArray);
-			})
-			.finally(() => {
-				setIsSorting(false);
-				setIsSearch(false);
-			});
+		setIsSorted(true);
+		const todosArr = Object.entries(todos).map(([id, { text }]) => {
+			return {
+				id: id,
+				text: text,
+			};
+		});
+		setTodos(sortBy(todosArr));
 	};
 
 	return (
@@ -150,7 +150,7 @@ function App() {
 			{isLoading ? (
 				<div className={styles.loader}></div>
 			) : (
-				todos.map(({ id, text }) => (
+				Object.entries(todos).map(([id, { text }]) => (
 					<div className={styles.list} key={id} id={id}>
 						<input type="checkbox" className={styles.checkbox}></input>
 						<span className={styles.todo}>{text}</span>
