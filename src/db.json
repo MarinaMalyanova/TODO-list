@@ -1,16 +1,18 @@
 {
-  "todos": {
-    "001": {
-      "text": "купить еды",
-      "complete": false
+  "todos": [
+    {
+      "id": 1,
+      "title": "Сделать ДЗ",
+      "completed": false
     },
-    "002": {
-      "text": "купить телефон",
-      "complete": false
+    {
+      "id": 2,
+      "title": "Покормить слона",
+      "completed": false
     },
-    "003": {
-      "text": "сделать дз",
-      "complete": false
+    {
+      "completed": false,
+      "id": 3
     }
-}
+  ]
 }
