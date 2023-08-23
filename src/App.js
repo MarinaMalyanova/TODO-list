@@ -8,6 +8,8 @@ import { NEW_TODO_ID } from './constants';
 function App() {
 	const [todos, setTodos] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
+	const [searchPhrase, setSearchPhrase] = useState('');
+	const [isAlphabetSorting, setIsAlphabetSorting] = useState(false);
 
 	const onTodoAdd = () => {
 		setTodos(addTodoInTodos(todos));
@@ -16,24 +18,18 @@ function App() {
 	const onTodoSave = (todoId) => {
 		const { title } = findTodo(todos, todoId) || {};
 
-		console.log('todoId', todoId);
 		if (todoId === NEW_TODO_ID) {
 			createTodo({ title, completed: false }).then((todo) => {
-				console.log('todo', todo);
-				console.log('title', title);
 				let updatedTodos = setTodoInTodos(todos, {
 					id: NEW_TODO_ID,
 					isEditing: false,
 				});
-				console.log('updatedTodos', updatedTodos);
 				updatedTodos = removeTodoInTodos(updatedTodos, NEW_TODO_ID);
 				updatedTodos = addTodoInTodos(updatedTodos, todo);
-				console.log('todo', todo);
 				setTodos(updatedTodos);
 			});
 		} else {
 			updateTodo({ id: todoId, title }).then(() => {
-				console.log('title', title);
 				setTodos(setTodoInTodos(todos, { id: todoId, isEditing: false }));
 			});
 		}
@@ -45,8 +41,6 @@ function App() {
 
 	const onTodoTitleChange = (id, newTitle) => {
 		setTodos(setTodoInTodos(todos, { id, title: newTitle }));
-		console.log('newTitle', newTitle);
-		console.log('todos', todos);
 	};
 
 	const onTodoComplitedChange = (id, newComplited) => {
@@ -62,14 +56,18 @@ function App() {
 	};
 
 	useEffect(() => {
-		readTodos()
+		readTodos(searchPhrase, isAlphabetSorting)
 			.then((loadedData) => setTodos(loadedData.reverse()))
 			.finally(() => setIsLoading(false));
-	}, []);
+	}, [searchPhrase, isAlphabetSorting]);
 
 	return (
 		<div className={styles.app}>
-			<ControlPanel onTodoAdd={onTodoAdd} />
+			<ControlPanel
+				onTodoAdd={onTodoAdd}
+				onSearch={setSearchPhrase}
+				onSorting={setIsAlphabetSorting}
+			/>
 
 			{isLoading ? (
 				<div className={styles.loader}></div>

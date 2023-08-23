@@ -1,0 +1,16 @@
+.input {
+	border: 1px solid #cccccc;
+	margin: 3px;
+	padding: 0 10px;
+	border-radius: 10px;
+	justify-content: start;
+	align-items: center;
+	font-size: 20px;
+	display: flex;
+	flex-wrap: wrap;
+	width: 100%;
+}
+.search {
+	display: flex;
+	width: 100%;
+}

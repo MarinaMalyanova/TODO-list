@@ -1,0 +1,18 @@
+.checkbox {
+	display: none;
+}
+.label {
+	position: absolute;
+	top: -2px;
+	left: -2px;
+	right: -2px;
+	bottom: -2px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+.checkbox:checked + .label {
+	box-shadow: inset 1px 1px 3px 0 green;
+	border-radius: 10px;
+	padding: 2px 0 0 2px;
+}
