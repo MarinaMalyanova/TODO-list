@@ -1,9 +1,10 @@
-import { Todo, ControlPanel } from './components';
+import { Todos, ControlPanel } from './components';
 import { createTodo, readTodos, updateTodo, deleteTodo } from './api';
 import { addTodoInTodos, findTodo, setTodoInTodos, removeTodoInTodos } from './utils';
 import { useEffect, useState } from 'react';
 import styles from './app.module.css';
 import { NEW_TODO_ID } from './constants';
+import { AppContext } from './context';
 
 function App() {
 	const [todos, setTodos] = useState([]);
@@ -62,34 +63,26 @@ function App() {
 	}, [searchPhrase, isAlphabetSorting]);
 
 	return (
-		<div className={styles.app}>
-			<ControlPanel
-				onTodoAdd={onTodoAdd}
-				onSearch={setSearchPhrase}
-				onSorting={setIsAlphabetSorting}
-			/>
+		<AppContext.Provider
+			value={{
+				todos,
+				onTodoSave,
+				onTodoEdit,
+				onTodoTitleChange,
+				onTodoComplitedChange,
+				onTodoRemove,
+			}}
+		>
+			<div className={styles.app}>
+				<ControlPanel
+					onTodoAdd={onTodoAdd}
+					onSearch={setSearchPhrase}
+					onSorting={setIsAlphabetSorting}
+				/>
 
-			{isLoading ? (
-				<div className={styles.loader}></div>
-			) : (
-				todos.map(({ id, title, completed, isEditing = false }) => (
-					<Todo
-						key={id}
-						id={id}
-						title={title}
-						completed={completed}
-						isEditing={isEditing}
-						onEdit={() => onTodoEdit(id)}
-						onTitleChange={(newTitle) => onTodoTitleChange(id, newTitle)}
-						onCompletedChange={(newComplited) =>
-							onTodoComplitedChange(id, newComplited)
-						}
-						onSave={() => onTodoSave(id)}
-						onRemove={() => onTodoRemove(id)}
-					/>
-				))
-			)}
-		</div>
+				{isLoading ? <div className={styles.loader}></div> : <Todos />}
+			</div>
+		</AppContext.Provider>
 	);
 }
 
